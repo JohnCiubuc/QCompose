@@ -1,8 +1,11 @@
 #include <QCoreApplication>
 #include <QDebug>
+
+#include "xkeyboardhook.h"
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    qDebug() <<"test\n";
+    XKeyboardHook * hk = new XKeyboardHook;
+
     return a.exec();
 }
