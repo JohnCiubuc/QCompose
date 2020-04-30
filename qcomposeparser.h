@@ -30,6 +30,7 @@ class QComposeParser : public QObject
 public:
     explicit QComposeParser(QObject *parent = nullptr);
 
+    QString lastChar;
 signals:
 private:
     QString locale;

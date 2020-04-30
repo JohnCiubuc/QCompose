@@ -101,6 +101,7 @@ QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
                             // DEBUG
                             QString debugString = "Full Sequence: ";
                             QString sequence = seq;
+                            lastChar = seq;
                             QStringList keys;
                             keys << parentNode->debugCharacter;
                             while(parentNode->parent != NULL)

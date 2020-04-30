@@ -17,15 +17,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         qcomposeparser.cpp \
-        xkeyboardhook.cpp
+        xkeyboardhook.cpp \
+        xkeys.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-LIBS += -lX11 -lXext -lXi
+LIBS += -lX11 -lXext -lXi -lXtst
 
 HEADERS += \
     qcomposeparser.h \
-    xkeyboardhook.h
+    xkeyboardhook.h \
+    xkeys.h
