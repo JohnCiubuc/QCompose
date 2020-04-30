@@ -54,6 +54,7 @@ private:
     QList<linked_node*> * Nodes;
     QList<linked_node*> * HitNodes;
     QList<KeySym> keyHits;
+    bool bIgnoreNext = false;
 };
 
 #endif // QCOMPOSEPARSER_H
