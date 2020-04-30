@@ -31,6 +31,7 @@ void sendString(QString string)
     if(xDisplay == NULL)
         qWarning() << "Unable to open XxDisplay";
 
+    qDebug() << "String sequence - " << string;
     bool bFlash = false;
     for(int i = 0; i < string.length(); i++)
     {
@@ -337,7 +338,6 @@ void QComposeParser::recieveKey(XKeyEvent e)
                     bFalse = true;
                     bIgnoreNext = true;
                     sendUCode("U007f");
-                    qDebug() << "POP IT";
                 }
                 if(Node->sequence.isEmpty())
                 {
