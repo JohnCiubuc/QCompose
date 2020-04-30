@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
+        qcomposeparser.cpp \
         xkeyboardhook.cpp
 
 # Default rules for deployment.
@@ -26,4 +27,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -lX11 -lXext -lXi
 
 HEADERS += \
+    qcomposeparser.h \
     xkeyboardhook.h
