@@ -9,6 +9,9 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
+#include "xkeys.h"
+#include <X11/Xlib.h>
+#include <QThread>
 
 struct linked_node
 {
@@ -32,9 +35,13 @@ public:
 
     QString lastChar;
 signals:
+public slots:
+    void recieveKey(XKeyEvent e);
 private:
     QString locale;
     QList<linked_node*> Nodes;
+    QList<linked_node*> HitNodes;
+    QList<KeySym> keyHits;
 };
 
 #endif // QCOMPOSEPARSER_H

@@ -7,12 +7,28 @@
 #include <X11/Xutil.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <QTimer>
 
 
-class XKeyboardHook
+class XKeyboardHook : public QObject
 {
+    Q_OBJECT
+signals:
+    void detectedKey(XKeyEvent);
 public:
     XKeyboardHook();
+private slots:
+    void watcher();
+private:
+    QTimer * watchTimer;
+    Display* d;
+    Window root;
+    Window curFocus;
+    char buf[17];
+    KeySym ks;
+    XComposeStatus comp;
+    int len;
+    int revert;
 };
 
 #endif // XKEYBOARDHOOK_H
