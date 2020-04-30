@@ -32,7 +32,6 @@ void XKeyboardHook::watcher()
             break;
 
         case KeyPress:
-            printf ("Got key!\n");
 
             detectedKey(ev.xkey);
             //                len = XLookupString(&ev.xkey, buf, 16, &ks, &comp);

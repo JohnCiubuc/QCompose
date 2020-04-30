@@ -10,7 +10,19 @@
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 #include "xkeys.h"
+
+
+#ifndef BOOLFIX
+#define BOOLFIX
+
+typedef int Bool;
+
+#endif
+
 #include <X11/Xlib.h>
+#include <stdbool.h>
+
+#include <X11/XKBlib.h>
 #include <QThread>
 
 struct linked_node
@@ -39,8 +51,8 @@ public slots:
     void recieveKey(XKeyEvent e);
 private:
     QString locale;
-    QList<linked_node*> Nodes;
-    QList<linked_node*> HitNodes;
+    QList<linked_node*> * Nodes;
+    QList<linked_node*> * HitNodes;
     QList<KeySym> keyHits;
 };
 

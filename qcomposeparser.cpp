@@ -77,6 +77,8 @@ void sendString(QString string)
 QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
 {
     setlocale(LC_ALL, "");
+    HitNodes = new  QList<linked_node*>;
+    Nodes = new  QList<linked_node*>;
     locale = setlocale(LC_ALL, NULL);
 //    QFile mainCompose("/usr/share/X11/locale/" + locale + "/Compose");
     QFile mainCompose("/home/inathero/.XCompose");
@@ -101,9 +103,11 @@ QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
 
             if(parse.size() >= 3)
             {
-                QString first = parse.takeFirst();
+//                QString first = parse.takeFirst();
+                QString first = parse.at(0);
                 if(first.contains("multi_key", Qt::CaseInsensitive))
                 {
+                    parse[0] = "<Alt_R>";
                     bool bFirstCharacter = true;
                     linked_node * parentNode = NULL;
                     foreach (QString seq, parse)
@@ -123,13 +127,15 @@ QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
                         //current
                         if(type == '<')
                         {
-                            seq = seq.toLower();
+//                            seq = seq.toLower();
                             if (bFirstCharacter)
                             {
                                 bFirstCharacter = false;
                                 // Checking existing nodes
-                                foreach (auto Node, Nodes)
+//                                foreach (auto  Node, Nodes)
+                                for(int x = 0; x < Nodes->size(); ++x)
                                 {
+                                    linked_node * Node = Nodes->at(x);
                                     // Existing node found
                                     if(Node->character == XStringToKeysym(seq.toLocal8Bit()))
                                     {
@@ -142,7 +148,7 @@ QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
                                 parentNode = new linked_node;
                                 parentNode->character = XStringToKeysym(seq.toLocal8Bit());
                                 parentNode->debugCharacter = seq;
-                                Nodes << parentNode;
+                                Nodes->append(parentNode);
                             }
                             else
                             {
@@ -213,75 +219,122 @@ void QComposeParser::recieveKey(XKeyEvent e)
         printf("Error: Could not open display!\n");
         return ;
     }
-    auto ks = XKeycodeToKeysym(display, e.keycode, 0);
+    auto ks = XkbKeycodeToKeysym( display, e.keycode,
+                                  0, e.state & ShiftMask ? 1 : 0);
     qDebug() << XKeysymToString (ks);
-    qDebug() << HitNodes.count();
-    if(keyHits.isEmpty())
+//    qDebug() << XStringToKeysym("Alt_R");
+
+    // First key
+    // Should be compose key
+    if(HitNodes->isEmpty())
     {
         qDebug("A");
         bool bFalse = false;
-        foreach(auto Node, Nodes)
+        for(int x = 0; x < Nodes->size(); ++x)
         {
+            linked_node * Node = Nodes->at(x);
+
+            qDebug() << Node->character;
+            qDebug() << ks;
+            qDebug() << XKeysymToString (Node->character);
+            qDebug() << XKeysymToString (ks);
+//            qDebug() << XKeysymToString (Node->character);
+            if(Node->character == ks)
+            {
+                foreach(auto nextNode, Node->nextNodes)
+                {
+                    bFalse = true;
+                    linked_node * linkNode = new linked_node;
+                    linkNode->sequence = nextNode->sequence;
+                    linkNode->parent = nextNode->parent;
+                    linkNode->character =nextNode->character;
+                    linkNode->nextNodes =nextNode->nextNodes;
+                    HitNodes->append(linkNode);
+                    qDebug("add");
+                }
+
+            }
+        }
+        for(int i = 0; i < HitNodes->size(); ++i)
+        {
+            linked_node * pNode = HitNodes->at(i);
+            linked_node * Node = pNode;
+            qDebug("-1-------------");
+//            qDebug() << pNode;
+//            qDebug() << *pNode;
+//            qDebug() << (*pNode)->character;
+            qDebug() << Node->character;
+            qDebug() << ks;
+            qDebug() << XKeysymToString (Node->character);
+            qDebug() << XKeysymToString (ks);
+        }
+//        if(bFalse)
+//            keyHits.append(ks);
+    }
+    else
+    {
+//        for(int i = 0; i < HitNodes->size(); ++i)
+//        {
+//            linked_node ** pNode = HitNodes->at(i);
+//            linked_node * Node = *pNode;
+//            qDebug("-2-------------");
+////            qDebug() << pNode;
+////            qDebug() << Node;
+////            qDebug() << *pNode;
+////            qDebug() << (*pNode)->character;
+//            qDebug() << Node->character;
+//            qDebug() << ks;
+//            qDebug() << XKeysymToString (Node->character);
+//            qDebug() << XKeysymToString (ks);
+//        }
+//        return;;
+        qDebug("B");
+        bool bFalse = false;
+        QList<linked_node*> * tempHitNodes = new  QList<linked_node*>  ;
+        for(int i = 0; i < HitNodes->size(); ++i)
+        {
+            qDebug("B1");
+            linked_node * pNode = HitNodes->at(i);
+            linked_node * Node = pNode;
+            qDebug() << Node;
+            qDebug() << XKeysymToString (Node->character);
+            qDebug() << Node->sequence;
+            qDebug() << Node->nextNodes.size();
             if(Node->character == ks)
             {
                 bFalse = true;
                 if(Node->sequence.isEmpty())
                 {
-//                    linked_node* n = new linked_node;
-//                    n = Node;
-//                    HitNodes << n;
+                    foreach(auto nextNode, Node->nextNodes)
+                    {
+                        bFalse = true;
+                        linked_node * linkNode = new linked_node;
+                        linkNode->sequence = nextNode->sequence;
+                        linkNode->parent = nextNode->parent;
+                        linkNode->character =nextNode->character;
+                        linkNode->nextNodes =nextNode->nextNodes;
+                        tempHitNodes->append(linkNode);
+                        qDebug("add");
+                    }
                 }
                 else
                 {
                     qDebug("GO");
                     sendString(Node->sequence);
-                    keyHits.clear();
+                    HitNodes->clear();
                     return;
                 }
             }
+
         }
-        if(bFalse)
-            keyHits.append(ks);
-    }
-    else
-    {
-        qDebug("B");
-        bool bFalse = false;
-        foreach(auto Node, Nodes)
-        {
-            qDebug("C1");
-            qDebug() << Node->sequence;
-            qDebug() << Node->character;
-            if(Node->character == keyHits.first())
-            {
-                foreach(auto Node, Node->nextNodes)
-                {
-                    if(Node->character == ks)
-                    {
-                        bFalse = true;
-                        if(Node->sequence.isEmpty())
-                        {
-                            //                    linked_node* n = new linked_node;
-                            //                    n = Node;
-                            //                    HitNodes << n;
-                        }
-                        else
-                        {
-                            qDebug("GO");
-                            sendString(Node->sequence);
-                            keyHits.clear();
-                            return;
-                        }
-                    }
-                }
-            }
-        }
+
         if(bFalse)
         {
-            keyHits.append(ks);
+            qDebug() << "copy";
+            HitNodes = tempHitNodes;
         }
         else
-            keyHits.clear();
+            HitNodes->clear();
     }
     //Close the connection to the selected X11 display.
     XCloseDisplay(display);
