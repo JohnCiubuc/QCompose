@@ -103,12 +103,8 @@ QComposeParser::QComposeParser(QObject* parent) : QObject(parent)
         if(mainCompose.open(QFile::ReadOnly))
         {
             QTextStream in(&mainCompose);
-            int i = 0;
             while (!in.atEnd())
             {
-                i++;
-//                if (i > 70)
-//                    break;
                 QString line = in.readLine().simplified();
 
                 if (line.size() == 0) continue;
@@ -253,10 +249,10 @@ void QComposeParser::recieveKey(XKeyEvent e)
                 foreach(auto nextNode, Node->nextNodes)
                 {
                     linked_node * linkNode = new linked_node;
-                    linkNode->sequence = nextNode->sequence;
-                    linkNode->parent = nextNode->parent;
-                    linkNode->character =nextNode->character;
-                    linkNode->nextNodes =nextNode->nextNodes;
+                    linkNode->sequence  = nextNode->sequence;
+                    linkNode->parent    = nextNode->parent;
+                    linkNode->character = nextNode->character;
+                    linkNode->nextNodes = nextNode->nextNodes;
                     HitNodes->append(linkNode);
                 }
 
@@ -285,10 +281,10 @@ void QComposeParser::recieveKey(XKeyEvent e)
                     foreach(auto nextNode, Node->nextNodes)
                     {
                         linked_node * linkNode = new linked_node;
-                        linkNode->sequence = nextNode->sequence;
-                        linkNode->parent = nextNode->parent;
-                        linkNode->character =nextNode->character;
-                        linkNode->nextNodes =nextNode->nextNodes;
+                        linkNode->sequence  = nextNode->sequence;
+                        linkNode->parent    = nextNode->parent;
+                        linkNode->character = nextNode->character;
+                        linkNode->nextNodes = nextNode->nextNodes;
                         tempHitNodes->append(linkNode);
                     }
                 }
