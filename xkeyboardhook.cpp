@@ -1,5 +1,11 @@
 #include "xkeyboardhook.h"
 
+int catcher( Display *disp, XErrorEvent *xe )
+{
+    qDebug() <<  "Window Destroyed" ;
+    return 0;
+}
+
 XKeyboardHook::XKeyboardHook()
 {
     d = XOpenDisplay(NULL);
@@ -25,10 +31,15 @@ void XKeyboardHook::watcher()
         case FocusOut:
             if (curFocus != root)
                 XSelectInput(d, curFocus, 0);
+            XSetErrorHandler( catcher );
             XGetInputFocus (d, &curFocus, &revert);
+            qDebug("c");
             if (curFocus == PointerRoot)
                 curFocus = root;
+            qDebug("ad");
             XSelectInput(d, curFocus, KeyPressMask|KeyReleaseMask|FocusChangeMask);
+            qDebug("ae");
+
             break;
 
         case KeyPress:
