@@ -22,41 +22,24 @@ XKeyboardHook::XKeyboardHook()
 
 void XKeyboardHook::watcher()
 {
-    while (1)
+    XEvent ev;
+    XNextEvent(d, &ev);
+    switch (ev.type)
     {
-        XEvent ev;
-        XNextEvent(d, &ev);
-        switch (ev.type)
-        {
-        case FocusOut:
-            if (curFocus != root)
-                XSelectInput(d, curFocus, 0);
-            XSetErrorHandler( catcher );
-            XGetInputFocus (d, &curFocus, &revert);
-            qDebug("c");
-            if (curFocus == PointerRoot)
-                curFocus = root;
-            qDebug("ad");
-            XSelectInput(d, curFocus, KeyPressMask|KeyReleaseMask|FocusChangeMask);
-            qDebug("ae");
+    case FocusOut:
+        if (curFocus != root)
+            XSelectInput(d, curFocus, 0);
+        XSetErrorHandler( catcher );
+        XGetInputFocus (d, &curFocus, &revert);
+        if (curFocus == PointerRoot)
+            curFocus = root;
+        XSelectInput(d, curFocus, KeyPressMask|KeyReleaseMask|FocusChangeMask);
 
-            break;
+        break;
 
-        case KeyPress:
+    case KeyPress:
 
-            detectedKey(ev.xkey);
-            //                len = XLookupString(&ev.xkey, buf, 16, &ks, &comp);
-            //                if (len > 0 && isprint(buf[0]))
-            //                {
-            //                    buf[len]=0;
-            //                    printf("String is: %s\n", buf);
-            //                }
-            //                else
-            //                {
-            //                    printf ("Key is: %d\n", (int)ks);
-            //                }
-            //        }
+        detectedKey(ev.xkey);
 
-        }
     }
 }
